@@ -1,0 +1,86 @@
+# eliminate text output during installation
+%%capture
+
+# install mathematical libraries to perform fast Fourier transforms
+! apt-get install -y libfftw3-3 libfftw3-dev libfftw3-doc
+# eliminate text output during installation
+%%capture
+
+# download the pre-compiled files in compressed format
+! gdown 'https://drive.google.com/uc?export=download&id=12C0ZyZ-01e3oibTSQMpDWPWgpIoRytgr' -O qe-lite.tgz
+
+# unpack the compressed files
+! tar -xvzf qe-lite.tgz
+
+# clean up some files
+! rm -rf sample_data qe-lite.tgz
+%%capture
+!apt install ase
+# create a folder and navigate into it
+%mkdir -p /content/silicon
+%cd /content/silicon/
+
+# create input and write it into a file
+qe_input = """
+&control
+  calculation='scf'
+  prefix='silicon',
+  pseudo_dir = '/content/qe-lite/pseudopotentials',
+  outdir='/content/silicon'
+/
+&system
+  ibrav = 2,
+  celldm(1) = 10.26,
+  nat = 2,
+  ntyp = 1,
+  ecutwfc = 30.0,
+  ecutrho = 120.0,
+/
+&electrons
+  conv_thr = 1e-8,
+/
+ATOMIC_SPECIES
+Si 28.086 Si.upf
+
+K_POINTS automatic
+1 1 1 0 0 0
+
+ATOMIC_POSITIONS (alat)
+  Si 0.0 0.0 0.0
+  Si 0.25 0.25 0.25
+
+"""
+
+with open("Si.scf.in", "w") as f:
+    f.write(qe_input)
+
+# print the content of the input file to check the parameters
+! cat Si.scf.in
+/content/silicon
+
+&control
+  calculation='scf'
+  prefix='silicon',
+  pseudo_dir = '/content/qe-lite/pseudopotentials',
+  outdir='/content/silicon'
+/
+&system
+  ibrav = 2,
+  celldm(1) = 10.26,
+  nat = 2,
+  ntyp = 1,
+  ecutwfc = 30.0,
+  ecutrho = 120.0,
+/
+&electrons
+  conv_thr = 1e-8,
+/
+ATOMIC_SPECIES
+Si 28.086 Si.upf
+
+K_POINTS automatic
+1 1 1 0 0 0
+
+ATOMIC_POSITIONS (alat)
+  Si 0.0 0.0 0.0
+  Si 0.25 0.25 0.25
